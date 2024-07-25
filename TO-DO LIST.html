@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        nav {
+            background-color: #444;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #555;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            animation: fadeIn 0.5s ease; /* Add fade-in animation */
+        }
+
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+
+        .todo-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 40px);
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Define the fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>To-Do List</header>
+<nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+</nav>
+<div class="container">
+    <!-- Regular To-Do List -->
+    <h2>Regular To-Do List</h2>
+    <input type="text" id="taskInput" placeholder="Enter a task...">
+    <button onclick="addTask()">Add Task</button>
+    <div id="taskList"></div>
+    <div>
+        <button onclick="filterTasks('all')">All Tasks</button>
+        <button onclick="filterTasks('active')">Active Tasks</button>
+        <button onclick="filterTasks('completed')">Completed Tasks</button>
+        <button onclick="clearCompleted()">Clear Completed</button>
+    </div>
+</div>
+
+<script>
+    let tasks = [];
+
+    function addTask() {
+        const input = document.getElementById("taskInput");
+        const task = input.value.trim();
+        if (task !== "") {
+            tasks.push({ name: task, completed: false });
+            renderTasks();
+            input.value = "";
+        } else {
+            alert("Please enter a task!");
+        }
+    }
+
+    function renderTasks() {
+        const taskList = document.getElementById("taskList");
+        taskList.innerHTML = "";
+        tasks.forEach((task, index) => {
+            const listItem = document.createElement("div");
+            listItem.className = "todo-item";
+            listItem.innerHTML = `
+          <input type="checkbox" onchange="toggleCompletion(${index})" ${
+                task.completed ? "checked" : ""
+            }>
+          <span ${
+                task.completed ? 'style="text-decoration: line-through;"' : ""
+            }>${task.name}</span>
+          <button onclick="removeTask(${index})">Delete</button>
+        `;
+            taskList.appendChild(listItem);
+        });
+    }
+
+    function removeTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
+    }
+
+    function toggleCompletion(index) {
+        tasks[index].completed = !tasks[index].completed;
+        renderTasks();
+    }
+
+    function filterTasks(filterType) {
+        let filteredTasks = [];
+        switch (filterType) {
+            case "active":
+                filteredTasks = tasks.filter((task) => !task.completed);
+                break;
+            case "completed":
+                filteredTasks = tasks.filter((task) => task.completed);
+                break;
+            default:
+                filteredTasks = tasks;
+                break;
+        }
+        renderFilteredTasks(filteredTasks);
+    }
+
+    function renderFilteredTasks(filteredTasks) {
+        const taskList = document.getElementById("taskList");
+        taskList.innerHTML = "";
+        filteredTasks.forEach((task, index) => {
+            const listItem = document.createElement("div");
+            listItem.className = "todo-item";
+            listItem.innerHTML = `
+          <input type="checkbox" onchange="toggleCompletion(${tasks.indexOf(
+                task
+            )})" ${task.completed ? "checked" : ""}>
+          <span ${
+                task.completed ? 'style="text-decoration: line-through;"' : ""
+            }>${task.name}</span>
+          <button onclick="removeTask(${tasks.indexOf(task)})">Delete</button>
+        `;
+            taskList.appendChild(listItem);
+        });
+    }
+
+    function clearCompleted() {
+        tasks = tasks.filter((task) => !task.completed);
+        renderTasks();
+    }
+</script>
+</body>
+</html>
